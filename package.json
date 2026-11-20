@@ -1,0 +1,7 @@
+{
+  "name": "org-project",
+  "private": true,
+  "scripts": {
+    "test": "node --test plugins/project-memory/tests/"
+  }
+}

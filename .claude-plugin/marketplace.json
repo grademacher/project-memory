@@ -1,0 +1,11 @@
+{
+  "name": "org-project",
+  "owner": { "name": "grademacher" },
+  "plugins": [
+    {
+      "name": "project-memory",
+      "source": "./plugins/project-memory",
+      "description": "Local-only project memory: auto context at session start, silent activity log, /wrap-up and /setup-tracking."
+    }
+  ]
+}
