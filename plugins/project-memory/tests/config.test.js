@@ -94,3 +94,51 @@ test('bad arguments: usage on stderr, exit 1, nothing written', () => {
   }
   assert.strictEqual(fs.readFileSync(file, 'utf8'), before);
 });
+
+test('roadmap-keep lists none by default', () => {
+  const { dir } = project({ config: '{"version":1}' });
+  const r = run(dir, 'roadmap-keep');
+  assert.strictEqual(r.status, 0, r.stderr);
+  assert.strictEqual(r.stdout, 'Roadmap sections kept: none\n');
+});
+
+test('roadmap-keep add stores the name and keeps other keys', () => {
+  const { dir, file } = project();
+  const r = run(dir, 'roadmap-keep', 'add', '8.', 'Maintenance', 'and', 'tech', 'debt');
+  assert.strictEqual(r.status, 0, r.stderr);
+  assert.strictEqual(r.stdout, 'Kept roadmap section: 8. Maintenance and tech debt\n');
+  const c = readJson(file);
+  assert.deepStrictEqual(c.roadmapKeep, ['8. Maintenance and tech debt']);
+  assert.strictEqual(c.deadEndCheck, false);
+  assert.strictEqual(c.version, 1);
+  run(dir, 'roadmap-keep', 'add', 'Appendix');
+  assert.strictEqual(run(dir, 'roadmap-keep').stdout, 'Roadmap sections kept: 8. Maintenance and tech debt | Appendix\n');
+});
+
+test('roadmap-keep add is case-insensitive idempotent', () => {
+  const { dir, file } = project();
+  run(dir, 'roadmap-keep', 'add', 'Appendix');
+  const r = run(dir, 'roadmap-keep', 'add', 'appendix');
+  assert.strictEqual(r.status, 0, r.stderr);
+  assert.strictEqual(readJson(file).roadmapKeep.length, 1);
+});
+
+test('roadmap-keep add with no name is a usage error', () => {
+  const { dir } = project();
+  assert.strictEqual(run(dir, 'roadmap-keep', 'add').status, 1);
+  assert.strictEqual(run(dir, 'roadmap-keep', 'bogus').status, 1);
+});
+
+test('roadmap-keep on an untracked project prints the untracked line', () => {
+  const { dir } = project({ tracked: false });
+  const r = run(dir, 'roadmap-keep', 'add', 'X');
+  assert.strictEqual(r.status, 0);
+  assert.strictEqual(r.stdout, "This project isn't tracked by project-memory.\n");
+});
+
+test('roadmapKeep ignores non-arrays and non-strings', () => {
+  const { roadmapKeep } = require('../lib/config');
+  assert.deepStrictEqual(roadmapKeep({}), []);
+  assert.deepStrictEqual(roadmapKeep({ roadmapKeep: 'x' }), []);
+  assert.deepStrictEqual(roadmapKeep({ roadmapKeep: ['a', 3, '', ' b '] }), ['a', ' b ']);
+});

@@ -17,4 +17,8 @@ function readConfig(memDir) {
 // Off unless config.json says exactly true.
 const deadEndCheckOn = (config) => config.deadEndCheck === true;
 
-module.exports = { configPath, readConfig, deadEndCheckOn };
+// Roadmap sections the user chose to keep; never proposed for folding again.
+const roadmapKeep = (config) =>
+  Array.isArray(config.roadmapKeep) ? config.roadmapKeep.filter((s) => typeof s === 'string' && s.trim()) : [];
+
+module.exports = { configPath, readConfig, deadEndCheckOn, roadmapKeep };
