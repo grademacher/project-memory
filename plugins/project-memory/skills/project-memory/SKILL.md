@@ -77,10 +77,27 @@ pointer to the roadmap, research and CHANGELOG.
     something or violate the project's nature if ignored (for example
     "read-only against the production database", "only one sync job may run at a time"), plus
     toolchain, OS and runtime requirements.
-- `## Active`: one `### <item name>` per item: goal, current state, next step.
-- `## Awaiting verification`: table `| Item | What to check |`.
-- `## Queue`: priority-ordered, numbered `###` items or table rows.
+- `## Awaiting verification`: table `| Item | What to check | Added |`
+  (Added is YYYY-MM-DD). When you add a dated row to an older two-column
+  table, first add the `Added` header cell, and an empty cell to each
+  existing row.
+- `## Queue`: highest priority first, `### <item name>` items (or table
+  rows, if the Queue already uses them) with goal, current state and next
+  step. The item being worked on is titled `### <item name> (in progress)`
+  and sits at the top. New items go at the bottom unless the user says
+  otherwise.
 - `## Parked`: table `| Item | Blocker |`.
+- `## Open questions`: bullets `- <question> (added YYYY-MM-DD)`. Add one
+  only when the user asks. When one is answered, the answer becomes a
+  Timeline decision and the bullet is removed.
+
+The sections always come in this order. There is no `## Active` section
+(an old one folds into the top of the Queue) and no project description
+(that lives in history). The user's own distinct sections go after Open
+questions, unchanged; the ones the user chose to keep are listed in
+config.json `roadmapKeep`. A legacy `## Working agreements` section that
+stands in for Hard constraints stays until the user approves migrating it.
+Wrap-up and setup put the sections in order with `scripts/roadmap.js`.
 
 Items are referred to by name, without IDs. No struck-through or ✅ rows:
 done items leave the roadmap (see the completed-item lifecycle below).
