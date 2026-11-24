@@ -13,6 +13,9 @@ ever committed.
 - **`/project-memory:wrap-up`** turns the session into history, roadmap,
   lessons and session-log updates. It shows one short summary and writes
   only after you approve. It can also save a real deep dive to `research/`.
+  It keeps the roadmap in a fixed order (Hard constraints → Awaiting
+  verification → Queue → Parked → Open questions) and suggests priority
+  and cleanup changes for you to approve.
 - **`/project-memory:setup-tracking`** works on new or existing projects. On
   existing projects it reads your docs and git history, drafts a history
   and roadmap, and files loose docs into `research/`, `reference/` and

@@ -164,16 +164,29 @@ file's modified time:
 ### 4.3 Draft history and roadmap (in context, nothing written)
 
 Read the existing history and roadmap docs fully, then convert them. If
-there are none, start from the skill's format. Converting only **adds or
-relabels** sections; it never deletes, merges or rewrites the user's
-sections or text. The only content that moves: done (✅ or struck-through)
-rows go to history, scattered Parked items go to `## Parked` with a
-pointer left behind, and rules and constraints are sorted as below.
+there are none, start from the skill's format. Converting never rewords
+the user's text and never drops it. What moves: done (✅ or
+struck-through) rows go to history, rules and constraints are sorted as
+below, and roadmap sections are folded as below.
 
-- Put the required headings first, in the skill's order. A section that
-  fits one gets relabeled to it, with its original heading kept as an
-  italic line under the new one. If several sections fit one heading,
-  relabel only the best fit.
+- **History:** put the required headings first, in the skill's order. A
+  section that fits one gets relabeled to it, with its original heading
+  kept as an italic line under the new one. If several sections fit one
+  heading, relabel only the best fit.
+- **Roadmap:** the sections come in the skill's fixed order: Hard
+  constraints, Awaiting verification, Queue, Parked, Open questions. A
+  section that fits one of them is **folded in**: its items move into that
+  section, each ending `(source: <original heading>)`, and the old heading
+  goes away. An Active or "in progress" section goes to the top of the
+  Queue, each item titled `### <item name> (in progress)`. A backlog,
+  TODO, "next steps" or feature-ideas list becomes Queue items at the
+  bottom, one each, in their order. A task list such as a "Game update
+  protocol" becomes one Queue item. Parked items scattered through other
+  sections go into Parked. When the formats differ (a table row going into
+  `###` items, or the reverse), convert each item to the target format
+  and keep its wording. Procedures and reference material inside a folded
+  section go to `reference/` under the rules below. Never extract open
+  questions; that section starts empty.
 - **Rules and constraints.** Existing working agreements, hard
   constraints (wherever they sit, including bolded lists inside "What this
   project is"), and rules in CLAUDE.md / CLAUDE.local.md are sorted by the
@@ -192,8 +205,8 @@ pointer left behind, and rules and constraints are sorted as below.
   `<memDir>/reference/notes.md` (caveats, tips, test-environment advice,
   security notes, build packaging and deploy facts), or a note on the
   related roadmap item.
-  A roadmap section that held them is relabeled `## Hard constraints`
-  (original heading as the italic line). A section elsewhere that is empty
+  A roadmap section that held them is folded into `## Hard constraints`.
+  A section elsewhere that is empty
   once its items have moved (such as history's old Hard constraints) is
   left out, and the plan says where its items went.
 - **Doc-folder rule.** If a classifier returned a `doc-folder-rule`,
@@ -211,12 +224,10 @@ pointer left behind, and rules and constraints are sorted as below.
   (the Timeline itself stays as is).
 - Rows marked ✅ or struck through leave the roadmap and become Timeline
   bullets under their date.
-- Parked items scattered through other sections move into `## Parked`,
-  with a one-line pointer left where they were.
-- Sections that fit no required heading (for example "Maintenance and tech
-  debt", "Optimization backlog", "Current verified memory map", an
-  appendix) **stay under their own headings, in their original order**,
-  after the required sections.
+- Sections that fit no required heading and are truly distinct (for
+  example "Current verified memory map", reference material, an appendix)
+  **stay under their own headings, in their original order**, after Open
+  questions. History sections that fit no heading stay the same way.
 - Keep the Timeline's existing date order; new entries follow it.
 
 Then fold in what the subagents returned, skipping anything already
@@ -236,8 +247,9 @@ recorded:
   instead of "see Timeline"; `decision` and `shipped` items go to
   the Timeline under their date; git milestones fill dates the Timeline
   doesn't cover.
-- `open-item` items go to the roadmap: Active if the source says work is
-  in progress, otherwise Queue. Never close anything.
+- `open-item` items go to the roadmap Queue: at the top, titled
+  `(in progress)`, if the source says work is underway; otherwise at the
+  bottom. Never close anything.
 - Every extracted line ends with its source: `(source: <path>)`, using
   the doc's path after setup.
 
@@ -271,7 +283,9 @@ Show one row per inventory file (history and roadmap docs included, class
 
 Under the table:
 - An outline of the drafted history.md and roadmap.md: each heading with
-  its item count, and which of the user's own sections are kept. Show Hard
+  its item count, and which of the user's own sections are kept. Show each
+  existing roadmap section on one line:
+  `<heading> → Queue (N items) | Parked | Awaiting verification | Hard constraints | reference/ | stays (kept)`. Show Hard
   constraints as two counts (rules for Claude / technical limits), then
   list what was excluded, one short line per item:
   `<short name> → <Timeline | reference/procedures.md | reference/notes.md | roadmap item note>`.
@@ -330,6 +344,15 @@ non-markdown file never moves, whatever the request.
    `Prior docs` table. Re-read each first: init-memory only wrote templates.
    Write `reference/procedures.md` and `reference/notes.md` too if the
    draft has them (never overwrite an existing file; add to it instead).
+   Then put the roadmap in order and record the sections that stayed, so
+   wrap-up doesn't propose folding them:
+
+   ```
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/roadmap.js" tidy "<root>"
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/config.js" "<root>" roadmap-keep add <section name>
+   ```
+
+   Run the second line once per kept section.
 7. Doc-folder rule, if the plan adopted one. If git doesn't track the
    rule's file, re-read it and Edit each line the plan listed (the rule
    line and its related lines): replace every mention of the old folder on
