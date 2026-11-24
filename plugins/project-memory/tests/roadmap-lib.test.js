@@ -169,3 +169,30 @@ test('the shipped template is already tidy', () => {
   assert.strictEqual(r.changed, false, r.text);
   assert.deepStrictEqual(headings(r.text), REQUIRED);
 });
+
+test('an unclosed fence does not add sections and stays idempotent', () => {
+  const lone = tidy(ORDERED.replace('## Queue\nq\n', '## Queue\n```\nnever closed\n'));
+  assert.deepStrictEqual(headings(lone.text), REQUIRED);
+  assert.strictEqual(tidy(lone.text).changed, false);
+  const input = ORDERED.replace('## Queue\nq\n', '## Queue\n``` inline ``` code\nunclosed\n');
+  const once = tidy(input);
+  assert.deepStrictEqual(headings(once.text), REQUIRED);
+  const twice = tidy(once.text);
+  assert.strictEqual(twice.changed, false);
+  assert.strictEqual(twice.text.split('## Parked').length, 2);
+});
+
+test('a four-backtick fence holding a three-backtick example stays one block', () => {
+  const input = ORDERED.replace('## Queue\nq\n', '## Queue\n````\n```\n## inner\n```\n````\n');
+  const r = tidy(input);
+  assert.deepStrictEqual(r.notes.extraSections, []);
+  assert.deepStrictEqual(headings(r.text).filter((h) => h !== 'inner'), REQUIRED);
+  assert.ok(r.text.indexOf('## inner') < r.text.indexOf('## Parked'));
+});
+
+test('keep list also silences Active and legacy working agreements notes', () => {
+  const r = tidy('## Active\nx\n## Working agreements\n- w\n', ['active', 'Working agreements']);
+  assert.strictEqual(r.notes.activeSection, false);
+  assert.strictEqual(r.notes.legacyWorkingAgreements, false);
+  assert.strictEqual(headings(r.text)[0], 'Working agreements');
+});

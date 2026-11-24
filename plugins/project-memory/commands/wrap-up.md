@@ -82,8 +82,12 @@ roadmap upkeep in step 3.
       each; a procedure goes to `reference/` under the normal rules).
       If it's truly distinct (reference material, a status map, an
       appendix), propose keeping it.
-    - `legacy-working-agreements`: propose migrating each entry into Hard
-      constraints or `reference/` under the strict tests.
+    - `legacy-working-agreements`: propose migrating the whole section in
+      one line, all or nothing: each entry goes to Hard constraints (under
+      Rules for Claude or Technical limits & requirements) or to
+      `reference/` under the strict tests, and the `## Working agreements`
+      heading is removed. Never migrate part of it: session start stops
+      loading Working agreements once Hard constraints exists.
 - New dead ends.
 - Lessons: new ones (only the three loggable kinds), streak updates,
   retirements, structural-fix proposals.
@@ -135,11 +139,13 @@ Then stop and wait for the reply.
   the question, what was found, the options compared and the conclusion,
   readable cold a month later, with its sources cited (URLs, file paths,
   commits). Never overwrite an existing file.
-- For each fold line that was approved as "keep", or declined, record the
-  section so it isn't proposed again (skip sections that were folded away):
+- For each fold or migration line that was approved as "keep", or
+  declined, record the section's exact heading text so it isn't proposed
+  again (skip sections that were folded away). This covers Active and
+  Working agreements too. Always quote the name:
 
 ```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/config.js" "${CLAUDE_PROJECT_DIR}" roadmap-keep add <section name>
+node "${CLAUDE_PLUGIN_ROOT}/scripts/config.js" "${CLAUDE_PROJECT_DIR}" roadmap-keep add "<section name>"
 ```
 
 - Put the roadmap's sections back in order (this only moves whole sections

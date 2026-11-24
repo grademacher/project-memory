@@ -349,7 +349,7 @@ non-markdown file never moves, whatever the request.
 
    ```
    node "${CLAUDE_PLUGIN_ROOT}/scripts/roadmap.js" tidy "<root>"
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/config.js" "<root>" roadmap-keep add <section name>
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/config.js" "<root>" roadmap-keep add "<section name>"
    ```
 
    Run the second line once per kept section.

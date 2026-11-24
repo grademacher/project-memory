@@ -10,7 +10,22 @@ const WA = 'working agreements';
 const ACTIVE = 'active';
 const RULES_RE = /^###\s+rules for claude\s*$/i;
 const TECH_RE = /^###\s+technical limits & requirements\s*$/i;
-const FENCE_RE = /^\s*(```|~~~)/;
+// CommonMark-style fences: up to 3 spaces, then 3+ backticks or tildes; a
+// backtick fence's info string has no backticks. A fence closes on the same
+// character, at least as long, with nothing after it.
+const FENCE_OPEN_RE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
+const FENCE_CLOSE_RE = /^ {0,3}(`{3,}|~{3,})\s*$/;
+
+function fenceOpen(line) {
+  const m = FENCE_OPEN_RE.exec(line);
+  if (!m || (m[1][0] === '`' && m[2].includes('`'))) return null;
+  return m[1];
+}
+
+function closesFence(line, open) {
+  const m = FENCE_CLOSE_RE.exec(line);
+  return !!m && m[1][0] === open[0] && m[1].length >= open.length;
+}
 
 const keyOf = (name) => String(name).trim().toLowerCase();
 
@@ -20,7 +35,9 @@ function trimTrailingBlank(lines) {
   return out;
 }
 
-function parse(text) {
+// Fence-aware split. A fence still open at the end of the file can't be
+// trusted, so the file is then parsed again with fences ignored.
+function parse(text, useFences = true) {
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
   const lines = text.split(/\r?\n/);
   if (lines.length && lines[lines.length - 1] === '') lines.pop();
@@ -28,9 +45,17 @@ function parse(text) {
   const sections = [];
   let fence = null;
   for (const line of lines) {
-    const f = FENCE_RE.exec(line);
-    if (f) fence = fence === null ? f[1] : (fence === f[1] ? null : fence);
-    const m = fence === null && !f ? /^## (.*)$/.exec(line) : null;
+    let inFence = false;
+    if (useFences) {
+      if (fence !== null) {
+        inFence = true;
+        if (closesFence(line, fence)) fence = null;
+      } else {
+        fence = fenceOpen(line);
+        inFence = fence !== null;
+      }
+    }
+    const m = inFence ? null : /^## (.*)$/.exec(line);
     if (m) {
       sections.push({ name: m[1].trim(), key: keyOf(m[1]), headingLine: line, body: [] });
     } else if (sections.length) {
@@ -39,6 +64,7 @@ function parse(text) {
       preamble.push(line);
     }
   }
+  if (useFences && fence !== null) return parse(text, false);
   return { eol, preamble, sections };
 }
 
@@ -153,8 +179,8 @@ function tidyRoadmap(text, templateText, keep = []) {
 
   const av = merged.get(keyOf('Awaiting verification'));
   const notes = {
-    activeSection: others.some((s) => s.key === ACTIVE),
-    legacyWorkingAgreements: legacy,
+    activeSection: others.some((s) => s.key === ACTIVE) && !keepKeys.has(ACTIVE),
+    legacyWorkingAgreements: legacy && !keepKeys.has(WA),
     extraSections: others
       .filter((s) => s.key !== ACTIVE && !(legacy && s.key === WA) && !keepKeys.has(s.key))
       .map((s) => s.name),
