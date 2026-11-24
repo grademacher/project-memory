@@ -12,7 +12,7 @@ const { getSection } = require('../lib/sections');
 
 const HEADINGS = {
   'history.md': ['What this project is', 'Dead ends', 'Timeline', 'Prior docs'],
-  'roadmap.md': ['Hard constraints', 'Active', 'Awaiting verification', 'Queue', 'Parked'],
+  'roadmap.md': ['Hard constraints', 'Awaiting verification', 'Queue', 'Parked', 'Open questions'],
   'lessons.md': ['Open', 'Retired', 'Candidates'],
 };
 
@@ -195,7 +195,7 @@ test('templates contain every required heading', () => {
   );
   assert.ok(lessons.includes('| Lesson | Retired on |'));
   const roadmap = fs.readFileSync(path.join(templatesDir, 'roadmap.md'), 'utf8');
-  assert.ok(roadmap.includes('| Item | What to check |'));
+  assert.ok(roadmap.includes('| Item | What to check | Added |'));
   assert.ok(roadmap.includes('| Item | Blocker |'));
   const hard = getSection(roadmap, 'Hard constraints');
   assert.deepStrictEqual(

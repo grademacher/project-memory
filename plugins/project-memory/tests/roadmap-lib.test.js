@@ -160,3 +160,12 @@ test('empty input gets all required sections', () => {
   assert.deepStrictEqual(headings(r.text), REQUIRED);
   assert.ok(r.text.endsWith('\n') && !r.text.endsWith('\n\n'));
 });
+
+test('the shipped template is already tidy', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const template = fs.readFileSync(path.join(__dirname, '..', 'templates', 'roadmap.md'), 'utf8');
+  const r = tidyRoadmap(template, template);
+  assert.strictEqual(r.changed, false, r.text);
+  assert.deepStrictEqual(headings(r.text), REQUIRED);
+});

@@ -7,18 +7,18 @@
 ### Technical limits & requirements
 <!-- Only hard limits that break something or violate the project's nature if ignored (for example "read-only: never writes to the system it reads"), plus toolchain, OS or runtime requirements, one bullet each. -->
 
-## Active
-<!-- One ### <item name> per item in progress: goal, current state, next step. -->
-
 ## Awaiting verification
-<!-- Done but not yet verified; remove a row once its check passes and history records it. -->
-| Item | What to check |
-| --- | --- |
+<!-- Done but not yet verified; remove a row once its check passes and history records it. Added is YYYY-MM-DD. -->
+| Item | What to check | Added |
+| --- | --- | --- |
 
 ## Queue
-<!-- Priority order, highest first: numbered ### items or table rows. Refer to items by name, no IDs. -->
+<!-- Priority order, highest first: ### <item name> items (or table rows) with goal, current state and next step. The item being worked on is titled ### <item name> (in progress) and sits at the top. New items go at the bottom unless the user says otherwise. Refer to items by name, no IDs. -->
 
 ## Parked
 <!-- Items that can't move until something else changes. -->
 | Item | Blocker |
 | --- | --- |
+
+## Open questions
+<!-- - <question> (added YYYY-MM-DD). Added only when the user asks. When answered, the answer becomes a history Timeline decision and the bullet is removed. -->
